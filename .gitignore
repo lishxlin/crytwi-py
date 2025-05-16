@@ -1,0 +1,57 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment directories
+venv/
+.env/
+.venv/
+
+# Editor backup and swap files
+*~
+*.swp
+*.swo
+*.bak
+
+# Emacs temporary and backup files
+.#*
+*~
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# PyInstaller files
+*.manifest
+*.spec
+
+# Test result and coverage reports
+.coverage
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Log files
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Compiled C extensions and shared libs
+*.so
+*.dll
+*.dylib
+
+# Local environment or IDE settings
+.envrc
+.idea/
+.vscode/
