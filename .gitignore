@@ -55,3 +55,6 @@ Thumbs.db
 .envrc
 .idea/
 .vscode/
+
+# No playground
+notebook_playground/
