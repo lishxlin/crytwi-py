@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Bytecode in src/ layout
+src/**/__pycache__/
+src/**/*.py[cod]
+
 # Virtual environment directories
 venv/
 .env/
