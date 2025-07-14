@@ -6,6 +6,7 @@ __pycache__/
 # Virtual environment directories
 venv/
 .env/
+.envrc
 .venv/
 
 # Editor backup and swap files
@@ -32,12 +33,45 @@ build/
 *.spec
 
 # Test result and coverage reports
-.coverage
 .pytest_cache/
 nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+
+# Test output and caches
+.tox/
+.nox/
+htmlcov/
+.coverage*
+.cache
+
+# Documentation output
+docs/_build/
+
+# Package manager lock files
+pdm.lock
+poetry.lock
+pixi.lock
+.pdm*
+
+# PEP 582 local package folders
+__pypackages__/
+
+# Cython debug directory
+cython_debug/
+
+# Debian build artifacts (avoid committing .deb package files, metadata, or temporary Debian files)
+*.deb
+*.dsc
+*.changes
+*.buildinfo
+debian/*.debhelper
+debian/*.substvars
+debian/*.log
+debian/*-stamp
+debian/files
+debian/tmp
 
 # Log files
 *.log
