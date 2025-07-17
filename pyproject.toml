@@ -1,0 +1,35 @@
+[project]
+name = "crytwi-py"
+version = "0.0.1"
+authors = [
+  { name = "ShXlin Li", email = "lishxlin@outlook.com" }
+]
+maintainers = [
+  { name = "ShXlin Li", email = "lishxlin@outlook.com" }
+]
+description = "Meta package for Crytwi Python tools (simple CLI, daemon, advanced CLI)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "LGPL-3.0-or-later"
+license-files = ["LICENSE*"]
+classifiers = [
+  "Development Status :: 1 - Planning",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+  "Operating System :: POSIX",
+  "Environment :: Console",
+  "Topic :: Security"
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+Homepage = "https://github.com/lishxlin/crytwi-py"
+Issues = "https://github.com/lishxlin/crytwi-py/issues"
+
+[project.scripts]
+crytwi = "crytwi.__main__:main"
+crytwid = "crytwid.__main__:main"
+crytorch = "crytorch.__main__:main"
