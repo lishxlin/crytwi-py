@@ -96,3 +96,6 @@ Thumbs.db
 
 # No playground
 notebook_playground/
+
+# No dev notes
+dev_notes/
