@@ -1,0 +1,86 @@
+import base64
+import os
+import getpass
+import gc
+import ctypes
+import time
+import re
+import errno
+from typing import BinaryIO, List, Dict, Tuple
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes, hmac
+from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+from .misc_utils import get_uint_max
+from .security import burn_mem
+
+
+def init_kdf_params(
+	at: int = 3,
+	ap: int = 1,
+	ac: int = 0xFFFF,
+	sn: int = 16384,
+	sr: int = 8,
+	sp: int = 1
+) -> tuple:
+	U8_MAX = get_uint_max(ctypes.c_uint8)
+	U16_MAX = get_uint_max(ctypes.c_uint16)
+
+	if not (0 <= at <= U8_MAX):
+		raise ValueError(f"Argon2id t_cost ({at}) exceeds {ctypes.c_uint8.__name__} range")
+	if not (0 <= ap <= U8_MAX):
+		raise ValueError(f"Argon2id p_parallel ({ap}) exceeds {ctypes.c_uint8.__name__} range")
+	if not (0 <= ac <= U16_MAX):
+		raise ValueError(f"Argon2id cost(kibibytes) ({ac}) exceeds {ctypes.c_uint16.__name__} range")
+	if not (0 <= sn <= U16_MAX):
+		raise ValueError(f"Scrypt N cost ({sn}) exceeds {ctypes.c_uint16.__name__} range")
+	if not (0 <= sr <= U8_MAX):
+		raise ValueError(f"Scrypt r cost ({sr}) exceeds {ctypes.c_uint8.__name__} range")
+	if not (0 <= sp <= U8_MAX):
+		raise ValueError(f"Scrypt p cost ({sp}) exceeds {ctypes.c_uint8.__name__} range")
+
+	return (at, ap, ac, sn, sr, sp)
+
+
+def generate_header_entropy() -> tuple[bytes, bytes, bytes]:
+	salt = os.urandom(ctypes.sizeof(ctypes.c_uint64 * 4))
+	iv_seed = os.urandom(ctypes.sizeof(ctypes.c_uint64))
+	r_val = os.urandom(ctypes.sizeof(ctypes.c_uint64))
+
+	return (salt, iv_seed, r_val)
+
+
+def derive_kdf_material(
+	pwd_buf: bytearray,
+	entropies: tuple,
+	kdf_params: tuple
+) -> Tuple[bytearray, bytearray]:
+	try:
+		# Scrypt KDF is used for metadata only
+		sKDF = Scrypt(
+			length=ctypes.sizeof(ctypes.c_uint64 * 4),
+			salt = entropies[0],
+			n = kdf_params[3],
+			r = kdf_params[4],
+			p = kdf_params[5]
+		).derive(pwd_buf)
+
+		# Argon2id KDF is used for payload only
+		aKDF = Argon2id(
+			salt = entropies[0],
+			length = 32,
+			iterations = kdf_params[0],
+			lanes = kdf_params[1],
+			memory_cost = kdf_params[2],
+			secret = entropies[2]
+		).derive(pwd_buf)
+
+		return bytearray(sKDF), bytearray(aKDF)
+	finally:
+		burn_mem(pwd_buf)
+		del pwd_buf
+		gc.collect()
