@@ -61,7 +61,7 @@ def file_splitter(
 	file: BinaryIO,
 	offset: int,  # Offset is the position that seek to.
 	length_kb: int = 64
-) -> bytes:
+) -> bytes | int:
 	try:
 		file.seek(offset)
 		data = file.read(int(length_kb * 1024))
@@ -77,7 +77,7 @@ def generate_chunk(
 	endian: int = 0x00,
 	final_flag: int = 0x00,
 	non_tag_length: int = (64 * 1024)
-) -> bytes:
+) -> bytes | int:
 	chunk_header = CrytwiFixedChunkStruct()
 
 	if endian == 0x00:
@@ -86,7 +86,7 @@ def generate_chunk(
 		endian_flag = 'big'
 	else:
 		print(f"[!] Endian {endian} not supported!")
-		errno.EPROTOTYPE
+		return errno.EPROTOTYPE
 	chunk_header.seq[:] = (seq).to_bytes(3, endian_flag)
 
 	chunk_header.fin = final_flag
@@ -123,7 +123,8 @@ def init_merger():
 	):
 		nonlocal expected_seq
 		if incoming_seq != expected_seq:
-			raise ValueError(f"Expected {expected_seq}, got {incoming_seq}")
+			print(f"Expected {expected_seq}, got {incoming_seq}")
+			return errno.EINVAL
 		target_file.write(data)
 		expected_seq += 1
 
@@ -184,7 +185,9 @@ def prep_chunk_extract(
 	fin_flag = header.fin
 	if actual_seq != expected_seq:
 		print(f"[!] Sequence mismatch: Expected {expected_seq}, got {actual_seq}")
+		return -errno.EBADMSG
 	if fin_flag == 0x02:
+		print("[*] Special flag 0x02 detected.")
 		return -1
 
 	return header.encrypted_payload_size
