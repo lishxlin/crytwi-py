@@ -1,18 +1,11 @@
-import base64
 import os
-import getpass
 import gc
 import ctypes
-import time
-import re
 import errno
-from typing import BinaryIO, List, Dict, Tuple
-from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives import hashes, hmac
-from cryptography.hazmat.primitives import padding
+from typing import Tuple
+from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from .misc_utils import get_uint_max
@@ -84,3 +77,81 @@ def derive_kdf_material(
 		burn_mem(pwd_buf)
 		del pwd_buf
 		gc.collect()
+
+
+def derive_chunk_iv(
+	iv_seed: bytes,
+	seq: int,
+	r_val: bytes
+) -> bytes:
+	digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+	digest.update(iv_seed)
+	digest.update(seq.to_bytes(3, 'little'))
+	digest.update(r_val)
+
+	return digest.finalize()[:12]
+
+
+def chunk_encryptor(
+	raw_data: bytes,
+	seq: int,
+	key: bytes,
+	iv: bytes
+) -> bytes:
+
+	print(f"[*] Going to encrypt chunk, id {seq}")
+	encryptor = Cipher(
+		algorithms.AES(key),
+		modes.GCM(iv)
+	).encryptor()
+
+	ciphertext = encryptor.update(raw_data) + encryptor.finalize()
+	blob = ciphertext + encryptor.tag
+
+	return blob
+
+
+def payload_decryptor(
+	p_bytes: bytes,
+	key: bytes,
+	iv: bytes,
+	tag: bytes,
+	chunk_seq: int,
+	mode: int = 0
+) -> bytes:
+	print(f"[*] Decrypting chunk {chunk_seq}")
+
+	decryptor = Cipher(
+		algorithms.AES(key),
+		modes.GCM(iv, tag)
+	).decryptor()
+
+	return decryptor.update(p_bytes) + decryptor.finalize()
+
+
+def payload_validator(
+	pt_bytes: bytes,
+	key: bytes,
+	iv: bytes,
+	chunk_seq: int,
+	mode: int = 0
+) -> int:
+	print(f"[*] Validating chunk integrity, id {chunk_seq} (mode: {mode})")
+
+	try:
+		tag = pt_bytes[-16:]
+		ciphertext = pt_bytes[:-16]
+
+		decryptor = Cipher(
+			algorithms.AES(key),
+			modes.GCM(iv, tag)
+		).decryptor()
+
+		decryptor.update(ciphertext)
+		decryptor.finalize()
+
+		return 0
+	except Exception as e:
+		print(f"[!] Integrity check FAILED for chunk {chunk_seq}: {e}")
+		return errno.EBADMSG
+# WE NEED USE ERRNO
