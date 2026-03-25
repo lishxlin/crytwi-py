@@ -19,22 +19,28 @@ def init_kdf_params(
 	sn: int = 16384,
 	sr: int = 8,
 	sp: int = 1
-) -> tuple:
+) -> tuple | int:
 	U8_MAX = get_uint_max(ctypes.c_uint8)
 	U16_MAX = get_uint_max(ctypes.c_uint16)
 
 	if not (0 <= at <= U8_MAX):
-		raise ValueError(f"Argon2id t_cost ({at}) exceeds {ctypes.c_uint8.__name__} range")
+		print(f"Argon2id t_cost ({at}) exceeds {ctypes.c_uint8.__name__} range")
+		return errno.EINVAL
 	if not (0 <= ap <= U8_MAX):
-		raise ValueError(f"Argon2id p_parallel ({ap}) exceeds {ctypes.c_uint8.__name__} range")
+		print(f"Argon2id p_parallel ({ap}) exceeds {ctypes.c_uint8.__name__} range")
+		return errno.EINVAL
 	if not (0 <= ac <= U16_MAX):
-		raise ValueError(f"Argon2id cost(kibibytes) ({ac}) exceeds {ctypes.c_uint16.__name__} range")
+		print(f"Argon2id cost(kibibytes) ({ac}) exceeds {ctypes.c_uint16.__name__} range")
+		return errno.EINVAL
 	if not (0 <= sn <= U16_MAX):
-		raise ValueError(f"Scrypt N cost ({sn}) exceeds {ctypes.c_uint16.__name__} range")
+		print(f"Scrypt N cost ({sn}) exceeds {ctypes.c_uint16.__name__} range")
+		return errno.EINVAL
 	if not (0 <= sr <= U8_MAX):
-		raise ValueError(f"Scrypt r cost ({sr}) exceeds {ctypes.c_uint8.__name__} range")
+		print(f"Scrypt r cost ({sr}) exceeds {ctypes.c_uint8.__name__} range")
+		return errno.EINVAL
 	if not (0 <= sp <= U8_MAX):
-		raise ValueError(f"Scrypt p cost ({sp}) exceeds {ctypes.c_uint8.__name__} range")
+		print(f"Scrypt p cost ({sp}) exceeds {ctypes.c_uint8.__name__} range")
+		return errno.EINVAL
 
 	return (at, ap, ac, sn, sr, sp)
 
@@ -92,13 +98,21 @@ def derive_chunk_iv(
 	return digest.finalize()[:12]
 
 
+def vla_decryptor(
+	mode: int = 0x00,
+	vla_ciphers: tuple = (),
+	kdf_key: bytes = b'',
+	iv_seed: bytes = b''
+) -> tuple | int:
+	pass
+
+
 def chunk_encryptor(
 	raw_data: bytes,
 	seq: int,
 	key: bytes,
 	iv: bytes
 ) -> bytes:
-
 	print(f"[*] Going to encrypt chunk, id {seq}")
 	encryptor = Cipher(
 		algorithms.AES(key),
@@ -111,7 +125,7 @@ def chunk_encryptor(
 	return blob
 
 
-def payload_decryptor(
+def chunk_decryptor(
 	p_bytes: bytes,
 	key: bytes,
 	iv: bytes,
@@ -129,7 +143,7 @@ def payload_decryptor(
 	return decryptor.update(p_bytes) + decryptor.finalize()
 
 
-def payload_validator(
+def chunk_validator(
 	pt_bytes: bytes,
 	key: bytes,
 	iv: bytes,

@@ -48,7 +48,7 @@ class CrytwiDynamicMetaHeader(ctypes.LittleEndianStructure):
 	_pack_ = 1
 	_fields_ = [
 		("encrypted_alias_len", ctypes.c_uint16),
-		("encrypted_filename_lenu", ctypes.c_uint16)
+		("encrypted_filename_len", ctypes.c_uint16)
 	]
 
 

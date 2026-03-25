@@ -2,7 +2,7 @@ import ctypes
 import time
 import errno
 from typing import BinaryIO, Tuple
-from .structs import CrytwiFixedMetaHeader, CrytwiDynamicMetaHeader, META_DYNAMIC_HEADER_SIZE
+from .structs import CrytwiFixedMetaHeader, CrytwiDynamicMetaHeader, META_DYNAMIC_HEADER_SIZE, META_FIXED_HEADER_SIZE
 from .constants import MAGICNUM, FORMAT_VERSION, SIGNATURE
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -93,14 +93,15 @@ def assemble_dynamic_meta_header(
 def extract_meta_header(
 	file: BinaryIO,
 	offset: int = 0
-) -> CrytwiFixedMetaHeader:
-	fixed_size = ctypes.sizeof(CrytwiFixedMetaHeader)
+) -> CrytwiFixedMetaHeader | int:
+	fixed_size = META_FIXED_HEADER_SIZE
 
 	file.seek(offset)
 	raw_bytes = file.read(fixed_size)
 
 	if len(raw_bytes) < fixed_size:
-		raise IOError(f"Header truncated: expected {fixed_size}")
+		print(f"Header truncated: expected {fixed_size}")
+		return errno.EIO
 
 	header_obj = CrytwiFixedMetaHeader.from_buffer_copy(raw_bytes)
 
@@ -113,22 +114,28 @@ def format_compat(
 	if ver == FORMAT_VERSION:
 		return 0
 	if ver > FORMAT_VERSION:
-		print(f"[*] Version too high:  File has {ver}")
+		print(f"[!] Version too high:  File has {ver}")
 		return errno.EPROTONOSUPPORT
 	# compat_helper() FUTURE UPDATE
 	return 0
 
 
-def dy_data(
+def dy_vla_cipher(
 	mode: int,
 	file: BinaryIO,
-	offset: int
-) -> Tuple:
+	offset: int  # the Dynamic Meta header start
+) -> Tuple | int:
 	# NOTES: Here we only dump VLA data, not header itself.
 	if mode != 0x01:
 		return ()
+
 	dyheader = CrytwiDynamicMetaHeader()
 	file.seek(offset)
-	file.read(META_DYNAMIC_HEADER_SIZE)
-	return (b'TODO', b'TODO')
-	# TO TIRED! GO SLEEP!
+	dymeta_bytes = file.read(META_DYNAMIC_HEADER_SIZE)
+	dymeta = dyheader.from_buffer_copy(dymeta_bytes)
+	ealias_len = dymeta.encrypted_alias_len
+	efilename_len = dymeta.encrypted_filename_len
+	alias_cipher = file.read(ealias_len)
+	filename_cipher = file.read(efilename_len)
+
+	return (alias_cipher, filename_cipher)
