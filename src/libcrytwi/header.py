@@ -25,7 +25,7 @@ def assemble_fixed_meta_header(
 		endian = 'big'
 	else:
 		print(f"[!] Endian {endian} not supported!")
-		errno.EPROTOTYPE
+		return errno.EPROTOTYPE
 	# Prepare fixed meta header structure
 	fixed_header = CrytwiFixedMetaHeader()
 
@@ -129,10 +129,9 @@ def dy_vla_cipher(
 	if mode != 0x01:
 		return ()
 
-	dyheader = CrytwiDynamicMetaHeader()
 	file.seek(offset)
 	dymeta_bytes = file.read(META_DYNAMIC_HEADER_SIZE)
-	dymeta = dyheader.from_buffer_copy(dymeta_bytes)
+	dymeta = CrytwiDynamicMetaHeader.from_buffer_copy(dymeta_bytes)
 	ealias_len = dymeta.encrypted_alias_len
 	efilename_len = dymeta.encrypted_filename_len
 	alias_cipher = file.read(ealias_len)

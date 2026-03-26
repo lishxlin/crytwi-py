@@ -5,7 +5,7 @@ from typing import BinaryIO, List, Dict
 from .structs import CrytwiFixedChunkStruct
 from .constants import TOTAL_TRAILER_READ_SIZE, CHUNK0_PATTERN_4B_FINAL, CHUNK0_PATTERN_4B_NON_FINAL
 from .constants import TRAILER_PATTERN_7B
-from .constants import PROBE_SIZE, MAGICNUM, SIGNATURE
+from .constants import PROBE_SIZE, MAGICNUM, SIGNATURE, GCM_TAG_SIZE
 from .structs import CHUNK_FIXED_HEADER_SIZE
 
 
@@ -92,8 +92,8 @@ def generate_chunk(
 	chunk_header.fin = final_flag
 	chunk_header.encrypted_payload_size = (ctypes.c_uint32)(int(non_tag_length * ctypes.sizeof(ctypes.c_uint8)))
 
-	if (int(len(data) - 16)) != int(non_tag_length * ctypes.sizeof(ctypes.c_uint8)):
-		print(f"[!] Get {int(len(data))}, wants {int(non_tag_length * ctypes.sizeof(ctypes.c_uint8) + 16)}")
+	if (int(len(data) - GCM_TAG_SIZE)) != int(non_tag_length * ctypes.sizeof(ctypes.c_uint8)):
+		print(f"[!] Get {int(len(data))}, wants {int(non_tag_length * ctypes.sizeof(ctypes.c_uint8) + GCM_TAG_SIZE)}")
 		return errno.EINVAL
 
 	return bytes(chunk_header) + data

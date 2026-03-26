@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.backends import default_backend
 from .misc_utils import get_uint_max
 from .security import burn_mem
@@ -99,12 +100,47 @@ def derive_chunk_iv(
 
 
 def vla_decryptor(
-	mode: int = 0x00,
+	manage_flag: int = 0x00,
 	vla_ciphers: tuple = (),
 	kdf_key: bytes = b'',
 	iv_seed: bytes = b''
 ) -> tuple | int:
-	pass
+	if manage_flag == 0x00:
+		return ()
+
+	alias_cipher, fname_cipher = vla_ciphers
+	iv_alias = HKDF(
+		algorithm=hashes.SHA256(),
+		length=12,
+		salt=iv_seed,
+		info=b"crytwi-alias-iv",
+		backend=default_backend()
+	).derive(kdf_key)
+
+	iv_filename = HKDF(
+		algorithm=hashes.SHA256(),
+		length=12,
+		salt=iv_seed,
+		info=b"crytwi-filename-iv",
+		backend=default_backend()
+	).derive(kdf_key)
+
+	alias_de = Cipher(
+		algorithms.AES(kdf_key),
+		modes.GCM(iv_alias),
+		backend=default_backend()
+	).decryptor()
+
+	fname_de = Cipher(
+		algorithms.AES(kdf_key),
+		modes.GCM(iv_filename),
+		backend=default_backend()
+	).decryptor()
+
+	return (
+		alias_de.update(alias_cipher).decode('utf-8'),
+		fname_de.update(fname_cipher).decode('utf-8')
+	)
 
 
 def chunk_encryptor(
