@@ -122,8 +122,9 @@ def init_merger():
 		incoming_seq: int,
 	):
 		nonlocal expected_seq
+		print(f"[*] I am processing {incoming_seq}, I hope next chunk is {incoming_seq + 1}")
 		if incoming_seq != expected_seq:
-			print(f"Expected {expected_seq}, got {incoming_seq}")
+			print(f"[!] Expected {expected_seq}, got {incoming_seq}")
 			return errno.EINVAL
 		target_file.write(data)
 		expected_seq += 1
@@ -131,9 +132,6 @@ def init_merger():
 	return merger
 # Note: MT-unsafe in current design! Use it in ST only.
 # A MT-safe merger PoC will be implemented in C.
-
-
-merge_chunks = init_merger()
 
 
 def chunks_format_checker(

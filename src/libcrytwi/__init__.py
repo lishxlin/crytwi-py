@@ -46,7 +46,7 @@ from .io_utils import (
 	file_splitter,
 	generate_chunk,
 	build_trailer,
-	merge_chunks,
+	init_merger,
 	chunks_format_checker,
 	prep_chunk_extract
 )
@@ -73,7 +73,7 @@ __all__ = [
 
 	# IO & Utils
 	'early_io_loader', 'compute_processor_map', 'file_splitter',
-	'generate_chunk', 'build_trailer', 'merge_chunks',
+	'generate_chunk', 'build_trailer', 'init_merger',
 	'chunks_format_checker', 'prep_chunk_extract', 'get_uint_max',
 
 	# Security
