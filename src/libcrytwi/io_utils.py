@@ -14,15 +14,17 @@ def early_io_loader(
 	offset: int = 0
 ) -> int:
 	try:
+		print(f"[*] I am preparing the file {file.name}")
 		file.seek(offset)
 		raw_probe = file.read(PROBE_SIZE)
 
 		if len(raw_probe) < (PROBE_SIZE):
 			return errno.ENOEXEC
 		if raw_probe[0] != MAGICNUM or raw_probe[1:7] != SIGNATURE:
-			print(f"[!] Signature Mismatch: Expected {hex(MAGICNUM)} {SIGNATURE}, got {raw_probe.hex()}")
+			print(f"[!] Signature Mismatch: Expected {hex(MAGICNUM)} {SIGNATURE.hex()}, got {raw_probe.hex()}")
 			return errno.ENOEXEC
 
+		print("[*] Seems OK.")
 		return 0
 	except Exception as e:
 		print(f"[!] IO Error during early probe: {e}")
@@ -181,6 +183,7 @@ def prep_chunk_extract(
 	header = CrytwiFixedChunkStruct.from_buffer_copy(chunk_header_bytes)
 	actual_seq = int.from_bytes(header.seq, "little")
 	fin_flag = header.fin
+	print(f"[*] Preparing chunk {actual_seq}, fin flag {fin_flag} extraction.")
 	if actual_seq != expected_seq:
 		print(f"[!] Sequence mismatch: Expected {expected_seq}, got {actual_seq}")
 		return -errno.EBADMSG
