@@ -11,7 +11,7 @@ description = "Meta package for Crytwi Python tools (simple CLI, daemon, advance
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "cryptography>=43.0.0",
+    "cryptography>=44.0.0",
 ]
 license = "LGPL-3.0-or-later"
 license-files = ["LICENSE*"]
