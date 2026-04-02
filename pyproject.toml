@@ -33,6 +33,6 @@ Issues = "https://github.com/lishxlin/crytwi-py/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-packages = ["libcrytwi"]
+packages = ["libcrytwi", "crytwi"]
 
 

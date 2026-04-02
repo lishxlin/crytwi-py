@@ -33,7 +33,7 @@ def early_io_loader(
 
 def compute_processor_map(
 	file_raw_size: int,
-	max_chunk_size_kb: int = 64,
+	max_chunk_size: int = (64 * 1024),
 	start_seq: int = 0
 ) -> List[Dict[int, int]]:
 	processor_map = []
@@ -41,7 +41,7 @@ def compute_processor_map(
 		return processor_map
 	current_offset = 0
 	remaining_data = 0
-	max_chunk_size_bytes = max_chunk_size_kb * 1024
+	max_chunk_size_bytes = max_chunk_size
 
 	total_data_chunks = int(file_raw_size // max_chunk_size_bytes)
 	remaining_data = int(file_raw_size % max_chunk_size_bytes)
@@ -62,11 +62,11 @@ def compute_processor_map(
 def file_splitter(
 	file: BinaryIO,
 	offset: int,  # Offset is the position that seek to.
-	length_kb: int = 64
+	length: int = (64 * 1024)
 ) -> bytes | int:
 	try:
 		file.seek(offset)
-		data = file.read(int(length_kb * 1024))
+		data = file.read(int(length))
 		return data
 	except Exception:
 		print("[!] We encountered in I/O Problem!")

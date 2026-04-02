@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.backends import default_backend
 from .misc_utils import get_uint_max
 from .security import burn_mem
+from .constants import GCM_TAG_SIZE
 
 
 def init_kdf_params(
@@ -189,8 +190,8 @@ def chunk_validator(
 	print(f"[*] Validating chunk integrity, id {chunk_seq} (mode: {mode})")
 
 	try:
-		tag = pt_bytes[-16:]
-		ciphertext = pt_bytes[:-16]
+		tag = pt_bytes[-GCM_TAG_SIZE:]
+		ciphertext = pt_bytes[:-GCM_TAG_SIZE]
 
 		decryptor = Cipher(
 			algorithms.AES(key),
