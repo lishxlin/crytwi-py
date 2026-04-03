@@ -372,6 +372,8 @@ def main():
 	args = parser.parse_args()
 
 	while True:
+		if (os.path.exists(args.output)) is False:
+			break
 		if os.path.isfile(args.output):
 			print(f"{args.output} is existed, which operation do you want?")
 			print("(c) Cancel this session.")
@@ -383,6 +385,13 @@ def main():
 				exit(0)
 			elif choice == 'r':
 				args.output = input("New path for it: ")
+				while True:
+					if args.output == "":
+						args.output = input("New path for it: ")
+						continue
+					else:
+						break
+				continue
 			elif choice == 'f':
 				break
 			elif choice == 's':
