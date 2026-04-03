@@ -30,10 +30,10 @@ def encrypt(args):
 	if kdf_params == errno.EINVAL:
 		raise Exception(kdf_params)
 
-	entrophy = libcrytwi.generate_header_entropy()
+	entropy = libcrytwi.generate_header_entropy()
 
 	fixed_header = libcrytwi.assemble_fixed_meta_header(
-		entropies=entrophy,
+		entropies=entropy,
 		kdf_params=kdf_params,
 		payload_len=raw_f_len,
 		max_chunk_size=int(args.max_chunk_size)
@@ -44,7 +44,7 @@ def encrypt(args):
 
 	kdfs = libcrytwi.derive_kdf_material(
 		pwd_buf=libcrytwi.get_pass(),
-		entropies=entrophy,
+		entropies=entropy,
 		kdf_params=kdf_params
 	)
 
@@ -69,9 +69,9 @@ def encrypt(args):
 					seq=cseq,
 					key=kdfs[1],
 					iv=libcrytwi.derive_chunk_iv(
-						entrophy[1],
+						entropy[1],
 						cseq,
-						entrophy[2]
+						entropy[2]
 					)
 				)
 				if cseq == (chunk_nums - 1):
@@ -375,15 +375,14 @@ def main():
 		if os.path.isfile(args.output):
 			print(f"{args.output} is existed, which operation do you want?")
 			print("(c) Cancel this session.")
-			print("(r) Let's me rename output.")
+			print("(r) Let me relocate the output.")
 			print("(f) Force override it.")
 			print("(s) Open a shell.")
 			choice = input("Enter your choice: ").lower()
 			if choice == 'c':
 				exit(0)
 			elif choice == 'r':
-				args.output = input("New name for it: ")
-				break
+				args.output = input("New path for it: ")
 			elif choice == 'f':
 				break
 			elif choice == 's':
