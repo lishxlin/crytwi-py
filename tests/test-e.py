@@ -20,7 +20,8 @@ entrophy = libcrytwi.generate_header_entropy()
 fixed_header = libcrytwi.assemble_fixed_meta_header(
 	entropies=entrophy,
 	kdf_params=kdf_params,
-	payload_len=raw_f_len
+	payload_len=raw_f_len,
+	manage_flag=0x01
 )
 
 out_f = open("parts-tests-files/single-py.test", "wb")
@@ -31,6 +32,19 @@ kdfs = libcrytwi.derive_kdf_material(
 	entropies=entrophy,
 	kdf_params=kdf_params
 )
+
+alias_str = "tests"
+filename_str = os.path.basename(raw_f.name)
+
+print(f"Input alias is {alias_str}, filename is {filename_str}")
+
+dynamic_header = libcrytwi.assemble_dynamic_meta_header(
+	manage_flag=0x01,
+	non_encrypt_meta_infos=(alias_str, filename_str),
+	kdf_key=kdfs[0],
+	iv_seed=entrophy[1]
+)
+out_f.write(dynamic_header)
 
 try:
 	CPM = libcrytwi.compute_processor_map(

@@ -11,10 +11,12 @@ try:
 	early_ret = libcrytwi.early_io_loader(enc_f)
 	if early_ret != 0:
 		raise Exception(early_ret)
+	print(f"[0] I am at {enc_f.tell()}")
 
 	header_obj = libcrytwi.extract_meta_header(
 		enc_f
 	)
+	print(f"[1] I am at {enc_f.tell()}")
 	if header_obj == errno.EIO:
 		raise Exception(header_obj)
 	if header_obj.endian_flag == 0x00:
@@ -22,8 +24,20 @@ try:
 		endian_flag = header_obj.endian_flag
 		endian = "little"
 	if header_obj.flags != 0x00:
-		print("[*] Only process isolated file.")
-		raise Exception(errno.EINVAL)
+		if header_obj.flags == 0x01:
+			print("[*] I think it's a managed file.")
+			dy_ret = libcrytwi.dy_vla_cipher(
+				mode=header_obj.flags,
+				file=enc_f,
+				offset=enc_f.tell()
+			)
+		else:
+			print("[*] I don't know which additional operations I need.")
+			raise Exception(errno.EINVAL)
+
+	print(f"[2] I am at {enc_f.tell()}")
+	# raise Exception("Expected exit, debugging purpose!")
+
 	ori_payload_len = int.from_bytes(bytes(header_obj.payload_len), 'little')
 	print(f"[*] Payload size is {ori_payload_len}.")
 	max_single_chunk_size = header_obj.max_single_chunk_size
@@ -56,7 +70,19 @@ try:
 		),
 		kdf_params=kdf_params
 	)
-	print(f"[*] My offset is {enc_f.tell()} now.")
+
+	dyde_ret = libcrytwi.vla_decryptor(
+		manage_flag=header_obj.flags,
+		vla_ciphers=dy_ret,
+		kdf_key=keys[0],
+		iv_seed=header_obj.master_iv_seed.to_bytes(
+			ctypes.sizeof(ctypes.c_uint64),
+			endian
+		)
+	)
+	if dyde_ret != ():
+		print(f"[*/I] Alias is {dyde_ret[0]}, filename is {dyde_ret[1]}")
+	print(f"[*/3] My offset is {enc_f.tell()} now.")
 	csfc_ret = libcrytwi.chunks_format_checker(
 		enc_f,
 		enc_f.tell(),
@@ -163,6 +189,8 @@ try:
 		ofs = enc_f.tell()
 		seq += 1
 
+	if dyde_ret != ():
+		print(f"[*/II] Alias is {dyde_ret[0]}, filename is {dyde_ret[1]}")
 	out_f.seek(os.SEEK_SET, os.SEEK_END)
 	out_f_len = out_f.tell()
 	if out_f_len != ori_payload_len:
