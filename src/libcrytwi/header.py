@@ -18,7 +18,7 @@ def assemble_fixed_meta_header(
 	kdf_params: tuple = (),
 	max_chunk_size: int = (64 * 1024),
 	payload_len: int = 0
-) -> bytes:
+) -> bytes | int:
 	if endian_flag == 0x00:
 		endian = 'little'
 	elif endian_flag == 0x01:
