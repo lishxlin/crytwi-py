@@ -1,0 +1,165 @@
+.TH LIBCRYTWI 3 2026-05-04 "crytwi-py 0.0.1-alpha"
+.SH NAME
+libcrytwi \- A secure file encryption library
+.SH LIBRARY
+Crytwi project, written in Python
+.RI ( libcrytwi )
+.SH SYNOPSIS
+.nf
+.BI "import "libcrytwi
+.PP
+.B libcrytwi.CrytwiDynamicMetaHeader
+.B libcrytwi.CrytwiFixedChunkStruct
+.B libcrytwi.CrytwiFixedMetaHeader
+.PP
+.BI libcrytwi.assemble_fixed_meta_header(
+.BI 	manage_flag: int = 0x00,
+.BI 	cipher_type: int = 0x00,
+.BI 	endian_flag: int = 0x00,
+.BI 	entropies: tuple = (),
+.BI 	kdf_params: tuple = (),
+.BI 	max_chunk_size: int = (64 * 1024),
+.BI 	payload_len: int = 0
+.B ) -> bytes
+.BI libcrytwi.assemble_dynamic_meta_header(
+.BI 	manage_flag: int = 0x00,
+.BI 	non_encrypt_meta_infos: tuple = (),
+.BI 	kdf_key: bytes = b'',
+.BI 	iv_seed: bytes = b'',
+.B ) -> bytes
+.BI libcrytwi.extract_meta_header(
+.BI 	file: BinaryIO,
+.BI 	offset: int = 0
+.B ) -> CrytwiFixedMetaHeader | int
+.BI libcrytwi.format_compat(
+.BI 	ver: int
+.B ) -> int
+.BI libcrytwi.dy_vla_cipher(
+.BI 	mode: int,
+.BI 	file: BinaryIO,
+.BI 	offset: int
+.B ) -> Tuple | int
+.PP
+.BI libcrytwi.init_kdf_params(
+.BI 	at: int = 3,
+.BI 	ap: int = 1,
+.BI 	ac: int = 0xFFFF,
+.BI 	sn: int = 16384,
+.BI 	sr: int = 8,
+.BI 	sp: int = 1
+.B ) -> tuple | int
+.BI libcrytwi.generate_header_entropy() -> tuple[bytes, bytes, bytes]
+.BI libcrytwi.derive_kdf_material(
+.BI 	pwd_buf: bytearray,
+.BI 	entropies: tuple,
+.BI 	kdf_params: tuple
+.B ) -> Tuple[bytearray, bytearray]
+.BI libcrytwi.derive_chunk_iv(
+.BI 	iv_seed: bytes,
+.BI 	seq: int,
+.BI 	r_val: bytes
+.B ) -> bytes
+.BI libcrytwi.vla_decryptor(
+.BI 	manage_flag: int = 0x00,
+.BI 	vla_ciphers: tuple = (),
+.BI 	kdf_key: bytes = b'',
+.BI 	iv_seed: bytes = b''
+.B ) -> tuple | int
+.BI libcrytwi.chunk_encryptor(
+.BI 	raw_data: bytes,
+.BI 	seq: int,
+.BI 	key: bytes,
+.BI 	iv: bytes
+.B ) -> bytes
+.BI libcrytwi.chunk_decryptor(
+.BI 	p_bytes: bytes,
+.BI 	key: bytes,
+.BI 	iv: bytes,
+.BI 	tag: bytes,
+.BI 	chunk_seq: int,
+.BI 	mode: int = 0
+.B ) -> bytes
+.BI libcrytwi.chunk_validator(
+.BI 	pt_bytes: bytes,
+.BI 	key: bytes,
+.BI 	iv: bytes,
+.BI 	chunk_seq: int,
+.BI 	mode: int = 0
+.B ) -> int
+.PP
+.BI libcrytwi.early_io_loader(
+.BI 	file: BinaryIO,
+.BI 	offset: int = 0
+.B ) -> int
+.BI libcrytwi.compute_processor_map(
+.BI 	file_raw_size: int,
+.BI 	max_chunk_size: int = (64 * 1024),
+.BI 	start_seq: int = 0
+.B ) -> List[Dict[int, int]]
+.BI libcrytwi.file_splitter(
+.BI 	file: BinaryIO,
+.BI 	offset: int,
+.BI 	length: int = (64 * 1024)
+.B ) -> bytes | int
+.BI libcrytwi.generate_chunk(
+.BI 	data: bytes,  # payload + tag
+.BI 	seq: int,
+.BI 	endian: int = 0x00,
+.BI 	final_flag: int = 0x00,
+.BI 	non_tag_length: int = (64 * 1024)
+.B ) -> bytes | int
+.BI libcrytwi.build_trailer(
+.BI 	total_seq: int
+.B ) -> bytes
+.BI libcrytwi.init_merger()
+.BI libcrytwi.chunks_format_checker(
+.BI 	p_chunks_h: BinaryIO,
+.BI 	p_chunks_ofs: int,
+.BI 	format_ver: int
+.B ) -> int
+.BI libcrytwi.prep_chunk_extract(
+.BI 	p_chunk_h: BinaryIO,
+.BI 	p_chunk_ofs: int,
+.BI 	expected_seq: int,
+.BI 	format_ver: int
+.B ) -> int
+.PP
+.BI libcrytwi.get_uint_max(ctypes_type)
+.PP
+.BI libcrytwi.get_pass(
+.B 	prompt=\(dqEnter\ Master\ Password: \(dq
+.B ) -> bytearray
+.BI libcrytwi.burn_mem(
+.BI 	buf: bytearray
+.B )
+.fi
+.SH DESCRIPTION
+.PP
+Crytwi Python version or libcrytwi provides several APIs to transform raw data streams and create a Crytwi format file. It facilitates the creation of encrypted volumes and supports random-access decryption, allowing users to verify and retrieve data from existing Crytwi files with minimal memory overhead.
+.PP
+libcrytwi implements a self-describing binary format with headers and deterministic chunking, enabling fast random access to encrypted data without external database dependencies.
+.SH EXAMPLES
+.PP
+Practical implementation examples are shipped with the library. For isolated mode command-line interface usage, refer to:
+.IP
+.I src/crytwi/cli.py
+.PP
+Simple verification scripts for manual testing of encryption and decryption routines are located in:
+.IP
+.I tests/
+.PP
+These scripts serve as a basic reference for integrating the library functions into a standard workflow.
+.SH ATTENTIONS
+.PP
+To utilize \fBArgon2id\fR features, a modern cryptographic environment is required \fB(OpenSSL >= 3.2 and Python Cryptography >= 44.0)\fR. Initialization will fail on legacy systems that do not meet these minimum version requirements.
+.SH AUTHOR
+.PP
+Written by ShXlin Li.
+.SH REPORTING BUGS
+.PP
+Report current Python version bugs in <\fIhttps://github.com/lishxlin/crytwi-py/issues\fR>.
+.SH SEE ALSO
+.PP
+GitHub Repository: https://github.com/lishxlin/crytwi-py
+.PP
+Linux Kernel fscrypt Documentation: https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html

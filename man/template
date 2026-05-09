@@ -1,0 +1,22 @@
+.TH LIBCRYTWI.?? 3 2026-05-04 "crytwi-py 0.0.1-alpha"
+.SH NAME
+
+.SH LIBRARY
+Crytwi project, written in Python
+.RI ( libcrytwi )
+.SH SYNOPSIS
+
+.SH DESCRIPTION
+
+.SH RETURN VALUE
+
+.SH ERRORS
+
+.SH ATTRIBUTES
+
+.SH CAVEATS
+
+.SH BUGS
+
+.SH SEE ALSO
+.BR libcrytwi (3),
