@@ -1,6 +1,6 @@
 .TH LIBCRYTWI.ASSEMBLE_FIXED_META_HEADER 3 2026-05-04 "crytwi-py 0.0.1-alpha"
 .SH NAME
-assemble_fixed_meta_header \- Assemble the fixed header
+assemble_fixed_meta_header \- Assemble the fixed metadata header
 .SH LIBRARY
 Crytwi project, written in Python
 .RI ( libcrytwi )
@@ -9,26 +9,52 @@ Crytwi project, written in Python
 .B import libcrytwi
 .PP
 .BI ret\ =\ libcrytwi.assemble_fixed_meta_header(
-.BI		manage_flag: int = 0x00,
-.BI		cipher_type: int = 0x00,
-.BI		endian_flag: int = 0x00,
-.BI		entropies: tuple = (),
-.BI		kdf_params: tuple = (),
-.BI		max_chunk_size: int = (64 * 1024),
-.BI		payload_len: int = 0
+.BI 	manage_flag: int = 0x00,
+.BI 	cipher_type: int = 0x00,
+.BI 	endian_flag: int = 0x00,
+.BI 	entropies: tuple = (),
+.BI 	kdf_params: tuple = (),
+.BI 	max_chunk_size: int = (64 * 1024),
+.BI 	payload_len: int = 0
 .BI )
 .fi
 .SH DESCRIPTION
-
+.PP
+The \fBassemble_fixed_meta_header()\fR funtion outputs a fixed metadata header bytes. It needs several arguments:
+.PP
+.B manage_flag
+This is used to indicate whether target file to be managed. Value of \fI0x00\fR should always indicate the target file to be isolated. If a file not tend to be managed, only fixed metadata header will be generated.
+.PP
+.B cipher_type
+This is used to specifies which algorithm to be used in encryption and decryption. In this version of \fBlibcrytwi(3)\fR, this is a reservation argument.
+.PP
+.B endian_flag
+This is used to specifies which endian to store data in headers. Value of \fI0x00\fR means use little endian and \fI0x01\fR means use big endian. In this version of \fBlibcrytwi(3)\fR, this is always \fI0x00\fR.
+.PP
+.B entropies
+A forced order of entropies like salt, IV seed, random value to be stored in fixed metadata header. 
+.PP
+.B kdf_params
+Scrypt and Argon2id KDF Parameters to be stored in fixed metadata header.
+.PP
+.B max_chunk_size
+This is used to indicate the maximum size for a completed filled chunk.
+.PP
+.B payload_len
+This is used to indicate the original file size. Should obtain from the report by filesystem.
 .SH RETURN VALUE
-
+On success, the function return a fixed metadata header bytes and \fIerrno\fR is set to indicate the error.
 .SH ERRORS
+.B EPROTOTYPE
+An endian provided is not supported in current version.
+\" .SH ATTRIBUTES
 
-.SH ATTRIBUTES
+\" .SH CAVEATS
 
-.SH CAVEATS
-
-.SH BUGS
+\" .SH BUGS
 
 .SH SEE ALSO
 .BR libcrytwi (3),
+.BR libcrytwi.init_kdf_params (3),
+.BR libcrytwi.generate_header_entropy (3),
+.BR errno (3)

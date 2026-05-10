@@ -1,0 +1,49 @@
+.TH LIBCRYTWI.ASSEMBLE_DYNAMIC_META_HEADER 3 2026-05-04 "crytwi-py 0.0.1-alpha"
+.SH NAME
+assemble_dynamic_meta_header - Assemble the dynamic metadata header
+.SH LIBRARY
+Crytwi project, written in Python
+.RI ( libcrytwi )
+.SH SYNOPSIS
+.nf
+.B import libcrytwi
+
+.BI ret\ =\ libcrytwi.assemble_dynamic_meta_header(
+.BI 	manage_flag: int = 0x00,
+.BI 	non_encrypt_meta_infos: tuple = (),
+.BI 	kdf_key: bytes = b'',
+.BI 	iv_seed: bytes = b'',
+.BI )
+.fi
+.SH DESCRIPTION
+The \fBassemble_dynamic_meta_header()\fR function outputs a packed with a special metadata header and some encrypted datas in bytes. It needs several arguments:
+.PP
+.B manage_flag
+This is used to indicate whether target file to be managed. Value of \fI0x00\fR should always indicate the target file to be isolated. If a file not tend to be managed, this function will do nothing.
+.PP
+.B non_encrypt_meta_infos
+In this version of \fBlibcrytwi(3)\fR, a forced order of data is needed. Data are original string of alias and filename in order.
+.PP
+.B kdf_key
+In this version of \fBlibcrytwi(3)\fR, a forced order of keys is needed. Keys are derived by using Scrypt and Argon2id in order.
+.PP
+.B iv_seed
+An IV seed is used for encrypt original data.
+.SH RETURN VALUE
+If \fBmanage_flag\fR is set to \fI0x00\fR, the function will outputs nothing.
+.PP
+Otherwise, it will outputs a dynamic metadata header and follow some encrypted data at same time.
+\" .SH ERRORS
+
+\" .SH ATTRIBUTES
+
+\" .SH CAVEATS
+
+\" .SH BUGS
+
+.SH SEE ALSO
+.BR libcrytwi (3),
+.BR libcrytwi.init_kdf_params (3),
+.BR libcrytwi.generate_header_entropy (3),
+.BR libcrytwi.assemble_fixed_meta_header (3),
+.BR libcrytwi.libcrytwi.derive_kdf_material (3)
