@@ -1,5 +1,5 @@
 Source: crytwi-py
-Section: unknown
+Section: python
 Priority: optional
 Maintainer: ShXlin Li <lishxlin@outlook.com>
 Rules-Requires-Root: no
@@ -7,32 +7,67 @@ Build-Depends:
  debhelper-compat (= 13),
  dh-sequence-python3,
  python3-setuptools,
- python3-all,
+ pybuild-plugin-pyproject,
+ python3-all (>= 3.13),
+ python3-cryptography (>= 44.0),
 #Testsuite: autopkgtest-pkg-python
 Standards-Version: 4.7.2
-Homepage: <insert the upstream URL, if relevant>
-#Vcs-Browser: https://salsa.debian.org/debian/crytwi-py
-#Vcs-Git: https://salsa.debian.org/debian/crytwi-py.git
+Homepage: https://github.com/lishxlin/crytwi-py
+Vcs-Browser: https://github.com/lishxlin/crytwi-py
+Vcs-Git: https://github.com/lishxlin/crytwi-py.git
 
 Package: crytwi-py
 Architecture: all
 Depends:
  ${python3:Depends},
  ${misc:Depends},
+ python3-crytwi,
 Suggests:
- python-crytwi-py-doc,
-Description: <insert up to 60 chars description> (Python 3)
- <Insert long description, indented with spaces.>
+ python-crytwi-doc,
+Description: A secure file encryption library (metapackage)
+ Crytwi Python version or libcrytwi provides several APIs to
+ transform raw data st reams and create a Crytwi format file.
  .
+ It facilitates the creation of encrypted volumes and supports
+ random-access decryption, allow ing users to verify and retrieve
+ data from existing Crytwi files with minimal memory overhead.
+ .
+ This is a metapackage.
+
+Package: python3-crytwi
+Architecture: all
+Depends:
+ python3 (>= 3.13),
+ ${python3:Depends},
+ ${misc:Depends},
+ ${shlibs:Depends},
+ python3-cryptography (>= 44.0),
+ libssl-dev (>= 3.5)
+Suggests:
+ python-crytwi-doc,
+Description: A secure file encryption library (Python 3)
+ Crytwi Python version or libcrytwi provides several APIs to
+ transform raw data st reams and create a Crytwi format file.
+ .
+ It facilitates the creation of encrypted volumes and supports
+ random-access decryption, allow ing users to verify and retrieve
+ data from existing Crytwi files with minimal memory overhead.
  This package installs the library for Python 3.
 
-Package: crytwi-py-doc
+Package: python-crytwi-doc
 Section: doc
 Architecture: all
 Depends:
- ${sphinxdoc:Depends},
  ${misc:Depends},
-Description: <insert up to 60 chars description> (common documentation)
- <Insert long description, indented with spaces.>
+ man-db,
+Description: A secure file encryption library (common documentation)
+ Crytwi Python version or libcrytwi provides several APIs to
+ transform raw data st reams and create a Crytwi format file.
  .
- This is the common documentation package.
+ It facilitates the creation of encrypted volumes and supports
+ random-access decryption, allow ing users to verify and retrieve
+ data from existing Crytwi files with minimal memory overhead.
+ This package installs the library for Python 3.
+ .
+ This package contains the documentation for crytwi.
+Build-Profiles: <!nodoc>
