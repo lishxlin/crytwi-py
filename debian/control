@@ -10,6 +10,7 @@ Build-Depends:
  pybuild-plugin-pyproject,
  python3-all (>= 3.13),
  python3-cryptography (>= 44.0),
+ libssl-dev (>= 3.5),
 #Testsuite: autopkgtest-pkg-python
 Standards-Version: 4.7.2
 Homepage: https://github.com/lishxlin/crytwi-py
@@ -42,7 +43,7 @@ Depends:
  ${misc:Depends},
  ${shlibs:Depends},
  python3-cryptography (>= 44.0),
- libssl-dev (>= 3.5)
+ libssl-dev (>= 3.5),
 Suggests:
  python-crytwi-doc,
 Description: Python library for secure file encryption (Python 3)
