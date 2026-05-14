@@ -1,6 +1,6 @@
-crytwi-py (0.0.1-alpha) UNRELEASED; urgency=medium
+crytwi-py (0.0.1-alpha+202605141) UNRELEASED; urgency=medium
 
   * Initial release. (Closes: #0)
   * Man pages are not complete.
 
- -- ShXlin Li <lishxlin@outlook.com>  Thu, 14 May 2026 10:01:14 +0800
+ -- ShXlin Li <lishxlin@outlook.com>  Thu, 14 May 2026 11:39:08 +0800
