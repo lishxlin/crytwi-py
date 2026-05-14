@@ -99,3 +99,14 @@ notebook_playground/
 
 # No dev notes
 dev_notes/
+
+# No debian/ but force some files into track
+debian/
+
+!debian/source
+!debian/control
+!debian/rules
+!debian/python-crytwi-doc.manpages
+!debian/changelog
+!debian/copyright
+!debian/README.Debian
