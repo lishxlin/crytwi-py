@@ -2,5 +2,6 @@ crytwi-py (0.0.1-alpha+202605141) UNRELEASED; urgency=medium
 
   * Initial release. (Closes: #0)
   * Man pages are not complete.
+  * This release comes without documents, and left many verbose outputs.
 
  -- ShXlin Li <lishxlin@outlook.com>  Thu, 14 May 2026 11:39:08 +0800
