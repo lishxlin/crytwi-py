@@ -24,7 +24,7 @@ Depends:
  python3-crytwi,
 Suggests:
  python-crytwi-doc,
-Description: A secure file encryption library (metapackage)
+Description: Python library for secure file encryption (metapackage)
  Crytwi Python version or libcrytwi provides several APIs to
  transform raw data st reams and create a Crytwi format file.
  .
@@ -45,7 +45,7 @@ Depends:
  libssl-dev (>= 3.5)
 Suggests:
  python-crytwi-doc,
-Description: A secure file encryption library (Python 3)
+Description: Python library for secure file encryption (Python 3)
  Crytwi Python version or libcrytwi provides several APIs to
  transform raw data st reams and create a Crytwi format file.
  .
@@ -60,7 +60,7 @@ Architecture: all
 Depends:
  ${misc:Depends},
  man-db,
-Description: A secure file encryption library (common documentation)
+Description: Python library for secure file encryption (common documentation)
  Crytwi Python version or libcrytwi provides several APIs to
  transform raw data st reams and create a Crytwi format file.
  .
